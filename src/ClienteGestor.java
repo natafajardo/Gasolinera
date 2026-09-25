@@ -6,11 +6,32 @@ import java.util.List;
 
     public class ClienteGestor {
 
+        private final ClienteRepository repository;
         private List<Cliente> clientes;
 
-        public ClienteGestor() {
-            clientes = new ArrayList<>();
+        public ClienteGestor(ClienteRepository repository) {
+
+            this.repository = repository;
+
+            this.clientes = repository.cargar();
         }
+
+        public List<Cliente> listar() {
+
+            List<Cliente> resultado =
+                    new ArrayList<>(clientes);
+
+            resultado.sort(
+                    Comparator.comparing(
+                            Cliente::getNombre,
+                            String.CASE_INSENSITIVE_ORDER
+                    ).thenComparing(Cliente::getId)
+            );
+
+            return resultado;
+        }
+
+
 
         public boolean existeMatricula(String matricula) {
 
@@ -130,5 +151,8 @@ import java.util.List;
             }
 
             return null;
+
         }
+
+
     }
