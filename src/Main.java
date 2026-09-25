@@ -1,26 +1,35 @@
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
+
     public static void main(String[] args) {
 
-        ClienteGestor gestor = new ClienteGestor();
-        Cliente natalia = gestor.registrar("natalia", "2345", "2345na");
-        Cliente jose = gestor.registrar("Jose", "6789", "12uyna");
+        try {
 
-        List<Cliente> resultados = gestor.buscar("jo");
+            Path rutaClientes = Paths.get(
+                    "data",
+                    "clientes.csv"
+            );
 
-        for (Cliente cliente : resultados) {
+            ClienteRepository repository = new ClienteRepositoryCSV(rutaClientes);
 
-            System.out.println(cliente.getNombre());
+            ClienteGestor clientegestor = new ClienteGestor(repository);
 
+            Menu menu =
+                    new Menu(clientegestor);
 
+            menu.iniciar();
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "No se pudo iniciar la aplicación."
+            );
+
+            System.out.println(
+                    "Motivo: " + e.getMessage()
+            );
         }
-
-
-
-
-
     }
 }
