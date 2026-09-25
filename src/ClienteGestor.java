@@ -100,6 +100,8 @@ import java.util.List;
                             matricula);
 
             clientes.add(nuevoCliente);
+            repository.guardar(clientes);
+
 
             return nuevoCliente;
         }
