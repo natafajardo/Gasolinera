@@ -16,8 +16,23 @@ public class Main {
 
             ClienteGestor clientegestor = new ClienteGestor(repository);
 
+
+
+            Path rutaPagos =
+                    Paths.get("data", "pagos.csv");
+
+            PagoRepository pagoRepository =
+                    new PagoRepositoryCSV(rutaPagos);
+
+
+            PagoGestor pagoGestor = new PagoGestor(pagoRepository, clientegestor);
+
+
+
+
+
             Menu menu =
-                    new Menu(clientegestor);
+                    new Menu(clientegestor, pagoGestor);
 
             menu.iniciar();
 
