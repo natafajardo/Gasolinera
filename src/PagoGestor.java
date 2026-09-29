@@ -8,10 +8,12 @@ public class PagoGestor {
 
     private List<Pago> pagos;
     private ClienteGestor clienteGestor;
+    private PagoRepository repository;
 
-    public PagoGestor(ClienteGestor clienteGestor) {
+    public PagoGestor(PagoRepository repository,ClienteGestor clienteGestor) {
+        this.repository = repository;
         this.clienteGestor = clienteGestor;
-        this.pagos = new ArrayList<>();
+        this.pagos = repository.cargar();
     }
 
     private int siguienteId() {
@@ -78,6 +80,7 @@ public class PagoGestor {
         );
 
         pagos.add(nuevoPago);
+        repository.guardar(pagos);
 
         return nuevoPago;
     }
