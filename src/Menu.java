@@ -1,27 +1,36 @@
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.Scanner;
-import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
-
 
 public class Menu {
 
     private final Scanner scanner;
-    private final ClienteGestor clientegestor;
+    private final ClienteGestor clienteGestor;
     private final PagoGestor pagoGestor;
-    private static final DateTimeFormatter FORMATO_FECHA =
-            DateTimeFormatter.ofPattern("dd/MM/uuuu")
-                    .withResolverStyle(ResolverStyle.STRICT);
 
+    private static final DateTimeFormatter
+            FORMATO_FECHA =
+            DateTimeFormatter
+                    .ofPattern("dd/MM/uuuu")
+                    .withResolverStyle(
+                            ResolverStyle.STRICT);
 
+    public Menu(
+            ClienteGestor clienteGestor,
+            PagoGestor pagoGestor) {
 
-    public Menu(ClienteGestor clientegestor, PagoGestor pagoGestor) {
-        this.scanner = new Scanner(System.in);
-        this.clientegestor = clientegestor;
-        this.pagoGestor = pagoGestor;
+        this.scanner =
+                new Scanner(System.in);
+
+        this.clienteGestor =
+                clienteGestor;
+
+        this.pagoGestor =
+                pagoGestor;
     }
 
     public void iniciar() {
@@ -29,10 +38,12 @@ public class Menu {
         int opcion;
 
         do {
+
             mostrarMenu();
 
-            System.out.print("Selecciona una opción: ");
-            opcion = leerEntero();
+            opcion =
+                    leerEntero(
+                            "Opción: ");
 
             switch (opcion) {
 
@@ -57,11 +68,13 @@ public class Menu {
                     break;
 
                 case 0:
-                    System.out.println("Programa finalizado.");
+                    System.out.println(
+                            "Hasta pronto.");
                     break;
 
                 default:
-                    System.out.println("Opción no válida.");
+                    System.out.println(
+                            "Opción no válida.");
             }
 
             System.out.println();
@@ -71,157 +84,123 @@ public class Menu {
 
     private void mostrarMenu() {
 
-        System.out.println("=================================");
-        System.out.println("       GESTIÓN GASOLINERA");
-        System.out.println("=================================");
-        System.out.println("1. Registrar cliente");
-        System.out.println("2. Listar clientes");
-        System.out.println("3. Buscar clientes");
-        System.out.println("4. Procesar pago de repostaje");
-        System.out.println("4. 5. Consultar pagos");
-        System.out.println("0. Salir");
-        System.out.println("=================================");
+        System.out.println(
+                "====================================");
+
+        System.out.println(
+                "       GESTIÓN DE GASOLINERA");
+
+        System.out.println(
+                "====================================");
+
+        System.out.println(
+                "1. Dar de alta un cliente");
+
+        System.out.println(
+                "2. Listar clientes");
+
+        System.out.println(
+                "3. Buscar clientes");
+
+        System.out.println(
+                "4. Procesar un pago de repostaje");
+
+        System.out.println(
+                "5. Consultar pagos");
+
+        System.out.println(
+                "0. Salir");
+
+        System.out.println(
+                "====================================");
     }
 
     private void registrarCliente() {
 
-        System.out.println();
-        System.out.println("--- REGISTRAR CLIENTE ---");
+        System.out.println(
+                "--- DAR DE ALTA CLIENTE ---");
 
-        String nombre;
+        String nombre =
+                leerTextoObligatorio(
+                        "Nombre: ");
 
-        do {
-            System.out.print("Nombre: ");
-            nombre = scanner.nextLine().trim();
+        String telefono =
+                leerTextoObligatorio(
+                        "Teléfono: ");
 
-            if (nombre.isEmpty()) {
-                System.out.println("El nombre es obligatorio.");
-            }
-
-        } while (nombre.isEmpty());
-
-
-        String telefono;
-
-        do {
-            System.out.print("Teléfono: ");
-            telefono = scanner.nextLine().trim();
-
-            if (telefono.isEmpty()) {
-                System.out.println("El teléfono es obligatorio.");
-            }
-
-        } while (telefono.isEmpty());
-
-
-        String matricula;
-
-        do {
-            System.out.print("Matrícula: ");
-            matricula = scanner.nextLine().trim();
-
-            if (matricula.isEmpty()) {
-                System.out.println("La matrícula es obligatoria.");
-            }
-
-        } while (matricula.isEmpty());
-
-
-        matricula = matricula.toUpperCase();
-
-
-        if (clientegestor.existeMatricula(matricula)) {
-
-            System.out.println(
-                    "No se puede registrar el cliente."
-            );
-
-            System.out.println(
-                    "La matrícula ya está registrada."
-            );
-
-            return;
-        }
-
+        String matricula =
+                leerTextoObligatorio(
+                        "Matrícula: ");
 
         try {
 
-            Cliente cliente = clientegestor.registrar(
-                    nombre,
-                    telefono,
-                    matricula
-            );
-
-            System.out.println();
-            System.out.println("Cliente registrado correctamente.");
-            System.out.println("ID asignado: " + cliente.getId());
-
-        } catch (Exception e) {
+            Cliente cliente =
+                    clienteGestor.registrar(
+                            nombre,
+                            telefono,
+                            matricula);
 
             System.out.println(
-                    "No se pudo guardar el cliente: "
-                            + e.getMessage()
-            );
+                    "Cliente registrado correctamente.");
+
+            System.out.println(
+                    "ID asignado: "
+                            + cliente.getId());
+
+        } catch (RuntimeException e) {
+
+            System.out.println(
+                    "No se pudo registrar el cliente: "
+                            + e.getMessage());
         }
     }
 
     private void listarClientes() {
 
-        System.out.println();
-        System.out.println("--- LISTADO DE CLIENTES ---");
+        System.out.println(
+                "--- LISTADO DE CLIENTES ---");
 
-        List<Cliente> clientes = clientegestor.listar();
+        List<Cliente> clientes =
+                clienteGestor.listar();
 
         mostrarClientes(clientes);
     }
 
     private void buscarClientes() {
 
-        System.out.println();
-        System.out.println("--- BUSCAR CLIENTES ---");
+        System.out.println(
+                "--- BUSCAR CLIENTES ---");
 
-        String texto;
+        String texto =
+                leerTextoObligatorio(
+                        "Texto que buscar: ");
 
-        do {
-
-            System.out.print("Texto a buscar: ");
-            texto = scanner.nextLine().trim();
-
-            if (texto.isEmpty()) {
-                System.out.println(
-                        "La búsqueda no puede estar vacía."
-                );
-            }
-
-        } while (texto.isEmpty());
-
-
-        List<Cliente> clientes = clientegestor.buscar(texto);
+        List<Cliente> clientes =
+                clienteGestor.buscar(texto);
 
         mostrarClientes(clientes);
     }
 
-    private void mostrarClientes(List<Cliente> clientes) {
+    private void mostrarClientes(
+            List<Cliente> clientes) {
 
         if (clientes.isEmpty()) {
 
-            System.out.println("No hay clientes.");
+            System.out.println(
+                    "No se han encontrado clientes.");
 
             return;
         }
 
-        System.out.println();
         System.out.printf(
                 "%-5s %-20s %-15s %-12s%n",
                 "ID",
                 "NOMBRE",
                 "TELÉFONO",
-                "MATRÍCULA"
-        );
+                "MATRÍCULA");
 
         System.out.println(
-                "-------------------------------------------------------"
-        );
+                "------------------------------------------------");
 
         for (Cliente cliente : clientes) {
 
@@ -230,27 +209,7 @@ public class Menu {
                     cliente.getId(),
                     cliente.getNombre(),
                     cliente.getTelefono(),
-                    cliente.getMatricula()
-            );
-        }
-    }
-
-    private int leerEntero() {
-
-        while (true) {
-
-            String texto = scanner.nextLine();
-
-            try {
-
-                return Integer.parseInt(texto);
-
-            } catch (NumberFormatException e) {
-
-                System.out.print(
-                        "Introduce un número válido: "
-                );
-            }
+                    cliente.getMatricula());
         }
     }
 
@@ -259,11 +218,8 @@ public class Menu {
         System.out.println(
                 "--- PROCESAR PAGO DE REPOSTAJE ---");
 
-
-        // Primero comprobamos si existen clientes.
-
         List<Cliente> clientes =
-                clientegestor.listar();
+                clienteGestor.listar();
 
         if (clientes.isEmpty()) {
 
@@ -276,12 +232,7 @@ public class Menu {
             return;
         }
 
-
-        // Mostramos los clientes para
-        // que el usuario pueda elegir uno.
-
         mostrarClientes(clientes);
-
 
         int idCliente;
 
@@ -289,63 +240,46 @@ public class Menu {
 
             idCliente =
                     leerEntero(
-                            "Identificador del cliente: ");
-
+                            "ID del cliente: ");
 
             if (idCliente <= 0) {
 
                 System.out.println(
-                        "El identificador debe ser "
-                                + "un número entero positivo.");
+                        "El ID debe ser positivo.");
 
                 continue;
             }
 
-
             Cliente cliente =
-                    clientegestor.buscarPorId(
+                    clienteGestor.buscarPorId(
                             idCliente);
-
 
             if (cliente == null) {
 
                 System.out.println(
-                        "El cliente no existe.");
+                        "No existe un cliente con "
+                                + "ese identificador.");
 
                 return;
             }
 
-
             break;
         }
-
-
-        // FECHA
 
         LocalDate fecha =
                 leerFecha();
 
-
-        // IMPORTE
-
         BigDecimal importe =
                 leerDecimalPositivo(
-                        "Importe: ");
-
-
-        // LITROS
+                        "Importe (€): ");
 
         BigDecimal litros =
                 leerDecimalPositivo(
                         "Litros: ");
 
-
-        // COMBUSTIBLE
-
         String combustible =
                 leerTextoObligatorio(
                         "Combustible: ");
-
 
         try {
 
@@ -357,29 +291,21 @@ public class Menu {
                             litros,
                             combustible);
 
-
             Cliente cliente =
-                    clientegestor.buscarPorId(
+                    clienteGestor.buscarPorId(
                             idCliente);
-
 
             System.out.println();
 
             System.out.println(
-                    "Pago registrado correctamente.");
-
-            System.out.println(
-                    "ID del pago: "
-                            + pago.getId());
-
-            System.out.println(
-                    "Cliente: "
-                            + cliente.getNombre());
-
-            System.out.printf(
-                    "Importe: %.2f%n",
-                    pago.getImporte());
-
+                    "Pago "
+                            + pago.getId()
+                            + " registrado para "
+                            + cliente.getNombre()
+                            + ": "
+                            + pago.getImporte()
+                            .toPlainString()
+                            + " €.");
 
         } catch (RuntimeException e) {
 
@@ -389,16 +315,13 @@ public class Menu {
         }
     }
 
-
     private void listarPagos() {
 
         System.out.println(
                 "--- CONSULTA DE PAGOS ---");
 
-
         List<Pago> pagos =
                 pagoGestor.listar();
-
 
         if (pagos.isEmpty()) {
 
@@ -408,9 +331,8 @@ public class Menu {
             return;
         }
 
-
         System.out.printf(
-                "%-5s %-10s %-12s %-12s %-12s %-15s%n",
+                "%-5s %-20s %-12s %-12s %-12s %-15s%n",
                 "ID",
                 "CLIENTE",
                 "FECHA",
@@ -418,17 +340,14 @@ public class Menu {
                 "LITROS",
                 "COMBUSTIBLE");
 
-
         System.out.println(
-                "----------------------------------------------------------------");
-
+                "--------------------------------------------------------------------------");
 
         for (Pago pago : pagos) {
 
             Cliente cliente =
-                    clientegestor.buscarPorId(
+                    clienteGestor.buscarPorId(
                             pago.getIdCliente());
-
 
             String nombreCliente;
 
@@ -443,16 +362,16 @@ public class Menu {
                         "Desconocido";
             }
 
-
             System.out.printf(
-                    "%-5d %-10d %-12s %-12.2f %-12.2f %-15s%n",
+                    "%-5d %-20s %-12s %-12.2f %-12.2f %-15s%n",
 
                     pago.getId(),
 
-                    pago.getIdCliente(),
+                    nombreCliente,
 
                     pago.getFecha()
-                            .format(FORMATO_FECHA),
+                            .format(
+                                    FORMATO_FECHA),
 
                     pago.getImporte(),
 
@@ -462,11 +381,6 @@ public class Menu {
         }
     }
 
-
-
-    // MÉTODOS DE LECTURA
-
-
     private String leerTextoObligatorio(
             String mensaje) {
 
@@ -475,20 +389,18 @@ public class Menu {
             System.out.print(mensaje);
 
             String texto =
-                    scanner.nextLine().trim();
-
+                    scanner.nextLine()
+                            .trim();
 
             if (!texto.isEmpty()) {
 
                 return texto;
             }
 
-
             System.out.println(
                     "Este campo es obligatorio.");
         }
     }
-
 
     private int leerEntero(
             String mensaje) {
@@ -498,8 +410,8 @@ public class Menu {
             System.out.print(mensaje);
 
             String texto =
-                    scanner.nextLine().trim();
-
+                    scanner.nextLine()
+                            .trim();
 
             try {
 
@@ -513,7 +425,6 @@ public class Menu {
         }
     }
 
-
     private BigDecimal leerDecimalPositivo(
             String mensaje) {
 
@@ -522,67 +433,62 @@ public class Menu {
             System.out.print(mensaje);
 
             String texto =
-                    scanner.nextLine().trim();
+                    scanner.nextLine()
+                            .trim();
 
-
+            // Permitimos coma o punto.
             texto =
                     texto.replace(',', '.');
-
 
             try {
 
                 BigDecimal valor =
                         new BigDecimal(texto);
 
-
                 if (valor.compareTo(
                         BigDecimal.ZERO) <= 0) {
 
                     System.out.println(
-                            "El valor debe ser mayor que cero.");
+                            "Debe ser mayor que cero.");
 
                     continue;
                 }
-
 
                 if (valor.scale() > 2) {
 
                     System.out.println(
-                            "El valor puede tener "
-                                    + "como máximo 2 decimales.");
+                            "Puede tener como máximo "
+                                    + "dos decimales.");
 
                     continue;
                 }
 
-
                 return valor;
-
 
             } catch (NumberFormatException e) {
 
                 System.out.println(
-                        "Introduce un número válido.");
+                        "Introduce una cantidad válida.");
             }
         }
     }
-
 
     private LocalDate leerFecha() {
 
         while (true) {
 
             System.out.print(
-                    "Fecha (dd/MM/yyyy, Enter = hoy): ");
+                    "Fecha (dd/MM/aaaa; "
+                            + "Enter = hoy): ");
 
             String texto =
-                    scanner.nextLine().trim();
-
+                    scanner.nextLine()
+                            .trim();
 
             if (texto.isEmpty()) {
 
                 return LocalDate.now();
             }
-
 
             try {
 
@@ -590,15 +496,11 @@ public class Menu {
                         texto,
                         FORMATO_FECHA);
 
-
             } catch (DateTimeParseException e) {
 
                 System.out.println(
-                        "Fecha no válida.");
+                        "La fecha no es válida.");
             }
         }
     }
-
-
-
 }
