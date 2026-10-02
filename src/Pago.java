@@ -9,8 +9,7 @@ public class Pago {
     private final BigDecimal litros;
     private final String combustible;
 
-    public Pago(int id, int idCliente, LocalDate fecha,
-                BigDecimal importe, BigDecimal litros, String combustible) {
+    public Pago(int id, int idCliente, LocalDate fecha, BigDecimal importe, BigDecimal litros, String combustible) {
         this.id = id;
         this.idCliente = idCliente;
         this.fecha = fecha;
