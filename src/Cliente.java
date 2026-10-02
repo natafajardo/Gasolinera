@@ -27,13 +27,4 @@ public class Cliente {
         return matricula;
     }
 
-    @Override
-    public String toString() {
-        return "Cliente{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", telefono='" + telefono + '\'' +
-                ", matricula='" + matricula + '\'' +
-                '}';
-    }
 }
