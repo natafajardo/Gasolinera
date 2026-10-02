@@ -10,32 +10,37 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PagoRepositoryCSV implements PagoRepository {
+public class PagoRepositoryCSV
+        implements PagoRepository {
 
     private final Path ruta;
 
     private static final String CABECERA =
             "id;idCliente;fecha;importe;litros;combustible";
 
-    private static final DateTimeFormatter FORMATO_FECHA =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    private static final DateTimeFormatter
+            FORMATO_FECHA =
+            DateTimeFormatter.ofPattern(
+                    "dd/MM/yyyy");
 
     public PagoRepositoryCSV(Path ruta) {
         this.ruta = ruta;
     }
 
-
     @Override
     public List<Pago> cargar() {
 
-        List<Pago> pagos = new ArrayList<>();
+        List<Pago> pagos =
+                new ArrayList<>();
 
         try {
 
             if (!Files.exists(ruta)) {
 
-                Files.createDirectories(ruta.getParent());
+                if (ruta.getParent() != null) {
+                    Files.createDirectories(
+                            ruta.getParent());
+                }
 
                 try (BufferedWriter writer =
                              Files.newBufferedWriter(
@@ -49,34 +54,40 @@ public class PagoRepositoryCSV implements PagoRepository {
                 return pagos;
             }
 
-
             try (BufferedReader reader =
                          Files.newBufferedReader(
                                  ruta,
                                  StandardCharsets.UTF_8)) {
 
-                String linea = reader.readLine();
+                // Leemos la cabecera.
+                String linea =
+                        reader.readLine();
 
-                // Saltamos la cabecera
-                linea = reader.readLine();
+                // Leemos la primera línea de datos.
+                linea =
+                        reader.readLine();
 
                 while (linea != null) {
 
                     if (!linea.isBlank()) {
 
-                        String[] campos = linea.split(";", -1);
+                        String[] campos =
+                                linea.split(";", -1);
 
                         if (campos.length != 6) {
+
                             throw new IllegalStateException(
                                     "Registro de pago incorrecto: "
                                             + linea);
                         }
 
                         int id =
-                                Integer.parseInt(campos[0]);
+                                Integer.parseInt(
+                                        campos[0]);
 
                         int idCliente =
-                                Integer.parseInt(campos[1]);
+                                Integer.parseInt(
+                                        campos[1]);
 
                         LocalDate fecha =
                                 LocalDate.parse(
@@ -85,35 +96,50 @@ public class PagoRepositoryCSV implements PagoRepository {
 
                         BigDecimal importe =
                                 new BigDecimal(
-                                        campos[3].replace(',', '.'));
+                                        campos[3]
+                                                .replace(
+                                                        ',',
+                                                        '.'));
 
                         BigDecimal litros =
                                 new BigDecimal(
-                                        campos[4].replace(',', '.'));
+                                        campos[4]
+                                                .replace(
+                                                        ',',
+                                                        '.'));
 
                         String combustible =
                                 campos[5];
 
-                        Pago pago = new Pago(
-                                id,
-                                idCliente,
-                                fecha,
-                                importe,
-                                litros,
-                                combustible
-                        );
+                        Pago pago =
+                                new Pago(
+                                        id,
+                                        idCliente,
+                                        fecha,
+                                        importe,
+                                        litros,
+                                        combustible);
 
                         pagos.add(pago);
                     }
 
-                    linea = reader.readLine();
+                    linea =
+                            reader.readLine();
                 }
             }
 
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException e) {
 
             throw new IllegalStateException(
                     "No se pudieron cargar los pagos: "
+                            + e.getMessage(),
+                    e);
+
+        } catch (RuntimeException e) {
+
+            throw new IllegalStateException(
+                    "Hay un problema en los datos "
+                            + "de pagos: "
                             + e.getMessage(),
                     e);
         }
@@ -121,14 +147,14 @@ public class PagoRepositoryCSV implements PagoRepository {
         return pagos;
     }
 
-
     @Override
     public void guardar(List<Pago> pagos) {
 
         try {
 
             if (ruta.getParent() != null) {
-                Files.createDirectories(ruta.getParent());
+                Files.createDirectories(
+                        ruta.getParent());
             }
 
             try (BufferedWriter writer =
@@ -147,7 +173,8 @@ public class PagoRepositoryCSV implements PagoRepository {
                                     + pago.getIdCliente()
                                     + ";"
                                     + pago.getFecha()
-                                    .format(FORMATO_FECHA)
+                                    .format(
+                                            FORMATO_FECHA)
                                     + ";"
                                     + pago.getImporte()
                                     .toPlainString()
