@@ -1,3 +1,10 @@
 id;idCliente;fecha;importe;litros;combustible
 1;1;29/09/2026;40.50;25;gasolina 95
 2;2;02/10/2026;45;1;gasolina
+3;1;01/08/2026;41;11;gasolina
+4;2;01/08/2026;10;1;gasolina
+5;1;01/07/2026;11;2;gASOLINA
+6;2;04/10/2026;15;5;Gasolina
+7;3;01/03/2026;1;1;gasolina
+8;3;01/08/2026;2;2;gasolina
+9;3;04/10/2026;1;5;gasolina extra
