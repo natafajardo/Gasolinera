@@ -1,50 +1,134 @@
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        try {
+        Scanner scanner =
+                new Scanner(System.in);
 
-            Path rutaClientes = Paths.get(
-                    "data",
-                    "clientes.csv"
+        Path carpetaJSON =
+                Paths.get("datos");
+
+        Path archivoClientes =
+                carpetaJSON.resolve("clientes.json");
+
+        Path archivoPagos =
+                carpetaJSON.resolve("pagos.json");
+
+        boolean existeJSON =
+                Files.exists(archivoClientes)
+                        || Files.exists(archivoPagos);
+
+        /*
+         * Solo preguntamos por migración cuando
+         * todavía no existe almacenamiento JSON.
+         */
+        if (!existeJSON) {
+
+            System.out.print(
+                    "No existe almacenamiento JSON. "
+                            + "¿Quieres migrar datos CSV? (s/n): "
             );
 
-            ClienteRepository repository = new ClienteRepositoryCSV(rutaClientes);
+            String respuesta =
+                    scanner.nextLine()
+                            .trim()
+                            .toLowerCase();
 
-            ClienteGestor clientegestor = new ClienteGestor(repository);
+            if (respuesta.equals("s")) {
 
+                System.out.print(
+                        "Ruta de la carpeta con los CSV: "
+                );
 
+                String rutaCSV =
+                        scanner.nextLine().trim();
 
-            Path rutaPagos =
-                    Paths.get("data", "pagos.csv");
+                Path carpetaCSV =
+                        Paths.get(rutaCSV);
 
-            PagoRepository pagoRepository =
-                    new PagoRepositoryCSV(rutaPagos);
+                try {
 
+                    MigraCSVToJson migrador =
+                            new MigraCSVToJson(
+                                    carpetaCSV
+                            );
 
-            PagoGestor pagoGestor = new PagoGestor(pagoRepository, clientegestor);
+                    migrador.migrar(
+                            carpetaJSON
+                    );
 
+                } catch (IOException e) {
 
+                    System.out.println(
+                            "Migración cancelada: "
+                                    + e.getMessage()
+                    );
 
+                    return;
+                }
 
+            } else {
 
-            Menu menu =
-                    new Menu(clientegestor, pagoGestor);
+                try {
 
-            menu.iniciar();
+                    Files.createDirectories(
+                            carpetaJSON
+                    );
 
-        } catch (Exception e) {
+                    AlmacenamientoJSON almacenamiento =
+                            new AlmacenamientoJSON(
+                                    carpetaJSON
+                            );
 
-            System.out.println(
-                    "No se pudo iniciar la aplicación."
-            );
+                    almacenamiento.guardarClientes(
+                            new java.util.ArrayList<>()
+                    );
 
-            System.out.println(
-                    "Motivo: " + e.getMessage()
-            );
+                    almacenamiento.guardarPagos(
+                            new java.util.ArrayList<>()
+                    );
+
+                } catch (IOException e) {
+
+                    System.out.println(
+                            "No se pudo crear "
+                                    + "el almacenamiento JSON: "
+                                    + e.getMessage()
+                    );
+
+                    return;
+                }
+            }
         }
+
+        Almacenamiento almacenamiento =
+                new AlmacenamientoJSON(
+                        carpetaJSON
+                );
+
+        ClienteGestor clienteGestor =
+                new ClienteGestor(
+                        almacenamiento
+                );
+
+        PagoGestor pagoGestor =
+                new PagoGestor(
+                        almacenamiento,
+                        clienteGestor
+                );
+        Menu menu =
+                new Menu(
+                        clienteGestor,
+                        pagoGestor
+                );
+
+        menu.iniciar();
+
     }
 }
