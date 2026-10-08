@@ -1,0 +1,3 @@
+{
+  "pagos": [{"id":1,"clienteId":1,"fecha":"2026-09-29","importe":40.50,"litros":25,"combustible":"gasolina 95"},{"id":2,"clienteId":2,"fecha":"2026-10-02","importe":45,"litros":1,"combustible":"gasolina"}]
+}
