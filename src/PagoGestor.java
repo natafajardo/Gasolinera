@@ -2,22 +2,28 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 
 public class PagoGestor {
 
     private List<Pago> pagos;
-    private PagoRepository repository;
+    private Almacenamiento almacenamiento;
     private ClienteGestor clienteGestor;
 
     public PagoGestor(
-            PagoRepository repository,
+            Almacenamiento almacenamiento,
             ClienteGestor clienteGestor) {
 
-        this.repository = repository;
+        this.almacenamiento = almacenamiento;
         this.clienteGestor = clienteGestor;
 
         // Cargamos los pagos guardados.
-        this.pagos = repository.cargar();
+        try {
+            this.pagos = almacenamiento.cargarPagos();
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "No se pudieron cargar los pagos.", e);
+        }
     }
 
     private int siguienteId() {
@@ -123,8 +129,12 @@ public class PagoGestor {
         nuevaLista.add(nuevoPago);
 
         // Primero guardamos en el archivo.
-        repository.guardar(nuevaLista);
-
+        try {
+            almacenamiento.guardarPagos(nuevaLista);
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "No se pudieron guardar los pagos.", e);
+        }
         // Si no hubo error, actualizamos memoria.
         pagos = nuevaLista;
 

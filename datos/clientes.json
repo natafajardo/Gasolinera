@@ -1,0 +1,3 @@
+{
+  "clientes": [{"id":1,"nombre":"ana","telefono":"1245","matricula":"12345AB"},{"id":2,"nombre":"Natalia","telefono":"4787","matricula":"AS1221"},{"id":3,"nombre":"walter","telefono":"54545","matricula":"AS4477"}]
+}

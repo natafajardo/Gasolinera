@@ -1,20 +1,22 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 
 public class ClienteGestor {
 
     private List<Cliente> clientes;
-    private ClienteRepository repository;
+    private Almacenamiento almacenamiento;
 
-    public ClienteGestor(
-            ClienteRepository repository) {
-
-        this.repository = repository;
-
-        // Al iniciar el programa cargamos
-        // los clientes guardados en el archivo.
-        this.clientes = repository.cargar();
+    public ClienteGestor(Almacenamiento almacenamiento) {
+        this.almacenamiento = almacenamiento;
+        try {
+            this.clientes = almacenamiento.cargarClientes();
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "No se pudieron cargar los clientes.", e);
+        }
     }
+
 
     private boolean existeMatricula(
             String matricula) {
@@ -93,10 +95,14 @@ public class ClienteGestor {
 
         nuevaLista.add(nuevoCliente);
 
-        // Primero intentamos guardar.
-        repository.guardar(nuevaLista);
+        try {
+            almacenamiento.guardarClientes(nuevaLista);
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "No se pudieron guardar los pagos.", e);
+        }
 
-        // Solo si guardar ha funcionado,
+
         // actualizamos la lista en memoria.
         clientes = nuevaLista;
 

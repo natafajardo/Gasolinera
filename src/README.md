@@ -1,333 +1,180 @@
-# Práctica 1 - Gestión de clientes y repostajes
+# Gestión de Gasolinera — Práctica 2
 
-## 1. Descripción
+## 1. Descripción del proyecto
 
-Este proyecto es una aplicación de consola hecha en Java para gestionar los clientes de una gasolinera y registrar los pagos de los repostajes.
+Esta aplicación de consola permite gestionar los clientes de una gasolinera y registrar sus pagos de repostaje.
 
-La aplicación permite:
+La Práctica 2 parte de la solución desarrollada en la **Práctica 1 (P1)**. Se conserva su funcionalidad y se modifica el sistema de almacenamiento para trabajar con archivos JSON, incorporando además un procedimiento para migrar los datos existentes en CSV.
 
-* Registrar clientes.
-* Listar clientes.
-* Buscar clientes.
-* Registrar pagos.
-* Consultar los pagos realizados.
-* Guardar la información para que no se pierda al cerrar el programa.
+El proyecto está desarrollado en Java y utiliza exclusivamente las clases y herramientas incluidas en el JDK, sin librerías externas.
 
-Los datos se guardan en archivos CSV utilizando las clases de Java para trabajar con archivos.
+## 2. Relación entre P1 y P2
 
----
+Se mantienen las funcionalidades principales de la primera práctica:
 
-## 2. Tecnologías utilizadas
+- Dar de alta clientes.
+- Listar los clientes registrados.
+- Buscar clientes por nombre, teléfono o matrícula.
+- Registrar pagos de repostaje asociados a un cliente existente.
+- Consultar los pagos registrados.
+- Conservar los datos al cerrar y volver a ejecutar el programa.
 
-* Java 21
-* IntelliJ IDEA
-* Archivos CSV
-* UTF-8
-* `Files` y `Path`
-* `BufferedReader` y `BufferedWriter`
-* `LocalDate`
-* `BigDecimal`
+La principal modificación de P2 es la sustitución del almacenamiento habitual en CSV por JSON. También se incorpora un proceso para trasladar los datos de la versión anterior al nuevo formato.
 
----
+| Aspecto | Práctica 1 (P1) | Práctica 2 (P2) |
+|---|---|---|
+| Almacenamiento habitual | CSV | JSON |
+| Persistencia | Archivos locales | Archivos locales |
+| Gestión de clientes | Se conserva | Se conserva |
+| Gestión de pagos | Se conserva | Se conserva |
+| Migración de datos | No incorporada | De CSV a JSON |
+| Librerías externas | No necesarias | No utilizadas |
 
-## 3. Estructura del proyecto
+## 3. Funcionalidades y validaciones
 
-```text
-proyecto-gasolinera
-│
-├── src
-│   ├── Cliente.java
-│   ├── ClienteRepository.java
-│   ├── ClienteRepositoryCSV.java
-│   ├── ClienteGestor.java
-│   ├── Pago.java
-│   ├── PagoRepository.java
-│   ├── PagoRepositoryCSV.java
-│   ├── PagoGestor.java
-│   ├── Menu.java
-│   └── Main.java
-│
-├── data
-│   ├── clientes.csv
-│   └── pagos.csv
-│
-└── README.md
-```
+### Gestión de clientes
 
----
+Cada cliente contiene un identificador, nombre, teléfono y matrícula.
 
-## 4. Responsabilidad de las clases
+Se aplican las siguientes validaciones:
 
-Intenté separar las clases para que cada una tenga una función concreta.
+- El nombre, teléfono y matrícula son obligatorios.
+- La matrícula se almacena en mayúsculas y no puede repetirse.
+- Los identificadores se generan automáticamente.
+- Los clientes se pueden buscar mediante coincidencias parciales en sus datos de búsqueda.
 
-### `Cliente`
+### Gestión de pagos
 
-Representa los datos de un cliente:
-
-* ID
-* Nombre
-* Teléfono
-* Matrícula
-
-No se encarga de guardar archivos ni de mostrar el menú.
-
-### `ClienteGestor`
-
-Se encarga de la parte relacionada con los clientes.
-
-Por ejemplo:
-
-* validar los datos;
-* comprobar que la matrícula no esté repetida;
-* generar el siguiente ID;
-* registrar clientes;
-* buscar clientes;
-* listar y ordenar clientes.
-
-### `ClienteRepository`
-
-Es una interfaz que define las operaciones para cargar y guardar clientes.
-
-### `ClienteRepositoryCSV`
-
-Es la clase que se encarga de leer y escribir los clientes en `clientes.csv`.
-
----
-
-### `Pago`
-
-Representa los datos de un pago:
-
-* ID
-* ID del cliente
-* Fecha
-* Importe
-* Litros
-* Combustible
-
-El campo `idCliente` permite relacionar el pago con el cliente correspondiente.
-
-### `PagoGestor`
-
-Se encarga de validar y registrar los pagos.
-
-También comprueba que el cliente indicado exista y calcula el siguiente ID del pago.
-
-### `PagoRepository`
-
-Define las operaciones para cargar y guardar pagos.
-
-### `PagoRepositoryCSV`
-
-Se encarga de leer y escribir los pagos en `pagos.csv`.
-
----
-
-### `Menu`
-
-Es la parte que interactúa directamente con el usuario.
-
-Muestra las opciones y pide los datos necesarios.
-
-El `Menu` no guarda directamente los datos en los archivos, sino que utiliza los gestores.
-
-### `Main`
-
-Es donde comienza el programa.
-
-Se encarga de crear los objetos necesarios y conectarlos para iniciar el menú.
-
----
-
-## 5. Relación entre las clases
-
-La idea general que seguí es:
-
-```text
-Main
-  ↓
-Menu
-  ↓
-Gestores
-  ↓
-Repositories
-  ↓
-Archivos CSV
-```
-
-Por ejemplo, para registrar un cliente:
-
-```text
-Menu
-  ↓
-ClienteGestor
-  ↓
-ClienteRepository
-  ↓
-ClienteRepositoryCSV
-  ↓
-clientes.csv
-```
-
-De esta manera, el menú no tiene que saber cómo funciona el archivo.
-
----
-
-## 6. Guardado de los datos
-
-Los datos se guardan en:
-
-```text
-data/clientes.csv
-data/pagos.csv
-```
-
-Si los archivos no existen, el programa los crea automáticamente.
-
-Cuando se registra un cliente o un pago, se guarda inmediatamente en el archivo.
-
-Al iniciar nuevamente el programa, los archivos se leen para recuperar los datos anteriores.
-
----
-
-## 7. Formato de `clientes.csv`
-
-Se utiliza `;` como separador.
-
-```text
-id;nombre;telefono;matricula
-```
-
-Ejemplo:
-
-```text
-1;Ana;612345678;1234ABC
-2;Jose;600111222;5678DEF
-```
-
-Los datos se guardan utilizando UTF-8.
-
----
-
-## 8. Formato de `pagos.csv`
-
-El archivo utiliza las siguientes columnas:
-
-```text
-id;idCliente;fecha;importe;litros;combustible
-```
-
-Ejemplo:
-
-```text
-1;1;15/09/2026;40.50;25.00;Gasolina
-```
-
-La fecha se guarda con el formato:
-
-```text
-dd/MM/yyyy
-```
-
-Los importes y litros se manejan con `BigDecimal`.
-
----
-
-## 9. Algunas validaciones
-
-### Clientes
-
-Al registrar un cliente se comprueba que:
-
-* el nombre no esté vacío;
-* el teléfono no esté vacío;
-* la matrícula no esté vacía;
-* la matrícula no esté repetida.
-
-La matrícula se guarda en mayúsculas.
-
-### Pagos
+Cada pago contiene un identificador, el identificador del cliente, la fecha, el importe, los litros y el tipo de combustible.
 
 Se comprueba que:
 
-* el cliente exista;
-* la fecha sea válida;
-* el importe sea mayor que cero;
-* los litros sean mayores que cero;
-* importe y litros tengan como máximo dos decimales;
-* el combustible no esté vacío.
+- El cliente exista.
+- La fecha sea válida.
+- El importe y los litros sean mayores que cero y tengan como máximo dos decimales.
+- El combustible no esté vacío.
+- El pago se guarde de forma persistente.
 
----
+Los clientes se muestran ordenados por nombre y, si coinciden, por identificador. Los pagos se muestran por fecha descendente y, en caso de empate, por identificador descendente.
 
-## 10. Ordenación
+## 4. Diseño de la solución
 
-Los clientes se muestran ordenados por nombre.
+### Abstracción del almacenamiento
 
-Si dos clientes tienen el mismo nombre, se utiliza el ID para decidir el orden.
+Se utiliza la interfaz `Almacenamiento` como punto común para las operaciones de lectura y escritura de clientes y pagos.
 
-Los pagos se muestran primero por la fecha más reciente y, si tienen la misma fecha, por el ID mayor.
+Las implementaciones concretas son:
 
-Para realizar estas ordenaciones utilicé ciclos y comparaciones sencillas, en lugar de utilizar código que todavía me resulta más difícil de entender.
+- `AlmacenamientoJSON`: permite cargar y guardar los datos en archivos JSON.
+- `AlmacenamientoCSV`: permite leer los archivos CSV de la versión anterior para realizar la migración.
 
-Esto también me permite modificar los métodos y explicar cómo funcionan.
+`ClienteGestor` y `PagoGestor` trabajan con la abstracción `Almacenamiento`, sin depender directamente del formato concreto de los archivos.
 
----
+Esta decisión reduce el acoplamiento y facilita cambiar la implementación del almacenamiento sin modificar la lógica principal de gestión.
 
-## 11. Decisiones de diseño
+### Conversión a JSON
 
-Una de las decisiones principales fue separar la lógica de los archivos.
+La clase `JsonTraductor` se encarga de transformar los datos al formato JSON y de interpretar el contenido para recuperar los objetos Java.
 
-Por ejemplo, `ClienteGestor` sabe cómo validar y registrar un cliente, mientras que `ClienteRepositoryCSV` sabe cómo guardarlo en el archivo.
+La conversión de clientes a texto utiliza las operaciones `map` y `reduce`, tal como se solicita en la práctica. La solución se implementa con funcionalidades de Java y sin bibliotecas externas de JSON.
 
-También utilicé interfaces para los repositorios. De esta forma, el gestor no depende directamente del archivo CSV.
+### Migración de datos
 
-La aplicación está dividida así:
+La clase `MigraCSVToJson` permite trasladar los datos de la versión anterior al nuevo almacenamiento.
 
-```text
-Cliente / Pago
-    ↓
-Datos
+El procedimiento:
 
-ClienteGestor / PagoGestor
-    ↓
-Lógica y validaciones
+1. Lee los clientes y los pagos existentes en CSV.
+2. Valida los datos y las relaciones entre los pagos y los clientes.
+3. Comprueba que el destino JSON no exista para evitar sobrescribir información.
+4. Guarda los datos en el nuevo formato cuando la validación se completa.
 
-Repository
-    ↓
-Operaciones de guardar y cargar
+La migración no modifica ni elimina los archivos CSV originales. Si se detectan datos no válidos durante la validación, se cancela antes de guardar el resultado.
 
-RepositoryCSV
-    ↓
-Archivos
+## 5. Estructura de archivos de datos
 
-Menu
-    ↓
-Interacción con el usuario
+La aplicación utiliza archivos locales en UTF-8.
+
+### Archivos de la Práctica 1
+
+La carpeta de datos CSV contiene:
+
+- `clientes.csv`
+- `pagos.csv`
+
+Estos archivos se conservan como origen de la migración.
+
+### Archivos de la Práctica 2
+
+La carpeta `datos` contiene:
+
+- `clientes.json`
+- `pagos.json`
+
+Los archivos JSON son el almacenamiento habitual de la nueva versión. La aplicación utiliza este formato para cargar los datos al iniciar y guardar los cambios durante su ejecución.
+
+## 6. Requisitos y ejecución
+
+### Requisitos
+
+- JDK 21.
+- Un entorno de desarrollo Java, como IntelliJ IDEA, o una terminal.
+- Los archivos fuente del proyecto.
+
+No es necesario instalar dependencias externas ni configurar una base de datos.
+
+### Ejecución desde el entorno de desarrollo
+
+1. Abrir el proyecto en IntelliJ IDEA.
+2. Comprobar que está configurado el JDK 21.
+3. Ejecutar la clase `Main`.
+4. Si todavía no existe el almacenamiento JSON, seguir las instrucciones para iniciar la migración desde CSV o comenzar con datos vacíos.
+5. Utilizar las opciones del menú para gestionar clientes y pagos.
+
+Es importante utilizar la carpeta de datos correcta cuando se solicite la ubicación de los archivos CSV.
+
+## 7. Versiones y control de cambios
+
+El proyecto se organiza en dos versiones comparables:
+
+- **P1:** versión final de la primera práctica, conservada en la rama `develop`.
+- **P2:** versión con almacenamiento JSON y migración, desarrollada en la rama `practica2-json`.
+
+La rama de P2 parte de la versión final de P1, de forma que los cambios pueden revisarse respecto al código original.
+
+Para consultar las ramas:
+
+```bash
+git branch
 ```
 
-Intenté mantener el código sencillo porque todavía estoy aprendiendo y quiero poder entender y modificar cada método.
+Para consultar el historial de cambios de P2:
 
----
+```bash
+git log --oneline practica2-json
+```
 
-## 12. Pruebas realizadas
+Para comparar los archivos entre ambas versiones:
 
-Algunas pruebas que se pueden realizar son:
+```bash
+git diff develop..practica2-json
+```
 
-* Registrar un cliente.
-* Intentar registrar una matrícula repetida.
-* Listar clientes.
-* Buscar un cliente.
-* Registrar un pago.
-* Intentar registrar un pago con un cliente que no existe.
-* Introducir un importe incorrecto.
-* Introducir una fecha incorrecta.
-* Cerrar y volver a abrir el programa para comprobar que los datos permanecen.
-* Comprobar que los siguientes IDs continúan desde los anteriores.
+El historial de Git permite identificar los cambios realizados durante la adaptación y consultar las versiones anteriores del código.
 
----
+## 8. Pruebas realizadas
 
-## 13. Conclusión
+Durante el desarrollo se ha comprobado:
 
-El objetivo de esta práctica fue crear una aplicación sencilla para gestionar clientes y pagos de una gasolinera, utilizando archivos para mantener los datos entre ejecuciones.
+- La migración de dos clientes y dos pagos desde CSV.
+- La lectura y visualización de los clientes desde JSON.
+- La consulta de pagos ordenados por fecha descendente.
+- El inicio de la aplicación después de completar la migración.
 
-Durante el desarrollo intenté separar las responsabilidades de las clases y utilizar un código que pueda entender y modificar, especialmente en las partes de validación, lectura, escritura y ordenación.
+También se debe comprobar el alta de nuevos clientes y pagos, su persistencia en los archivos JSON y la recuperación de los datos al reiniciar el programa.
+
+## 9. Documentación complementaria
+
+El archivo `CAMBIOS.md` recoge los cambios introducidos respecto a P1 y explica las decisiones de diseño, especialmente la interfaz común de almacenamiento, la implementación JSON, el uso de `map` y `reduce` y la migración desde CSV.
+
+La documentación y el historial de Git permiten relacionar los cambios del código con los objetivos de la segunda práctica.
