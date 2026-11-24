@@ -34,7 +34,7 @@
 - Mantener la estructura de paquetes (paquete por defecto), las responsabilidades actuales y la compatibilidad con JDK 21.
 - Priorizar cambios pequeños y sencillos. No añadir capas, frameworks, bibliotecas JSON, ORM, base de datos ni dependencias externas sin justificación y autorización.
 - No sustituir el parser JSON manual ni cambiar el formato de los archivos sin revisar compatibilidad con los datos existentes y con la migración CSV.
-- Respetar UTF-8 y las rutas relativas actuales. No asumir que el directorio de trabajo es `src/`.
+- Respetar UTF-8 y las rutas relativas actuales. No asumir que el directorio de trabajo es `src`.
 - No modificar ni borrar los CSV originales durante una migración; no sobrescribir un destino JSON existente.
 - No conectar los gestores directamente a una implementación concreta de almacenamiento: conservar la dependencia con `Almacenamiento`.
 - No añadir funcionalidades de MySQL solo porque existe `docker-compose.yml`: ese compose describe una infraestructura separada y la aplicación Java actual no usa JDBC ni SQL.
